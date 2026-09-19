@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Mijn profiel — Naaf{% endblock %}
+{% block content %}
+
+  <section style="padding-top:56px; padding-bottom:96px;">
+    <div class="wrap" style="max-width:980px;">
+      <div class="profile-header">
+        {% if professional.profielfoto_bestandsnaam %}
+          <img src="{{ url_for('admin_professional_foto', professional_id=professional.id) }}" alt="" class="professional-photo" style="width:80px; height:80px;">
+        {% else %}
+          <div class="profile-photo-placeholder">{{ professional.naam[:1] }}</div>
+        {% endif %}
+        <div class="profile-header-info">
+          <h2>{{ professional.naam }}</h2>
+          <p>{{ professional.vakgebied }}{% if professional.woonplaats %} · {{ professional.woonplaats }}{% endif %}</p>
+        </div>
+        <a href="{{ url_for('professional_profiel_wijzigen') }}" class="btn btn-outline">Profiel bewerken</a>
+      </div>
+
+      {% with messages = get_flashed_messages(with_categories=true, category_filter=['professional-profiel-success','professional-profiel-error']) %}
+        {% for category, message in messages %}
+          <div class="flash {{ 'success' if category == 'professional-profiel-success' else 'error' }}">{{ message }}</div>
+        {% endfor %}
+      {% endwith %}
+
+      <div class="profile-grid">
+        <div class="profile-card">
+          <h3>Mijn gegevens</h3>
+          <ul class="profile-fact-list">
+            <li><span class="profile-fact-label">E-mail</span><span>{{ professional.email }}</span></li>
+            {% if professional.telefoon %}<li><span class="profile-fact-label">Telefoon</span><span>{{ professional.telefoon }}</span></li>{% endif %}
+            {% if professional.linkedin %}<li><span class="profile-fact-label">LinkedIn</span><a href="{{ professional.linkedin }}" target="_blank" rel="noopener">bekijk profiel</a></li>{% endif %}
+            <li><span class="profile-fact-label">Voorkeur</span><span>{{ professional.voorkeur }}</span></li>
+            {% if professional.ervaring %}<li><span class="profile-fact-label">Ervaring</span><span>{{ professional.ervaring }}</span></li>{% endif %}
+            {% if professional.beschikbaarheid %}<li><span class="profile-fact-label">Beschikbaar vanaf</span><span>{{ professional.beschikbaarheid }}</span></li>{% endif %}
+          </ul>
+
+          {% if professional.tags %}
+            <div class="tag-list-display" style="margin-top:16px;">
+              {% for tag in professional.tags %}<span class="tag-chip">{{ tag }}</span>{% endfor %}
+            </div>
+          {% endif %}
+
+          {% if professional.toelichting %}
+            <p class="profile-toelichting">{{ professional.toelichting }}</p>
+          {% endif %}
+
+          {% if professional.cv_bestandsnaam %}
+            <a href="{{ url_for('professional_eigen_cv') }}" target="_blank" rel="noopener" class="btn btn-outline" style="margin-top:18px; width:100%; text-align:center;">Bekijk mijn cv</a>
+          {% endif %}
+        </div>
+
+        <div class="profile-sollicitaties">
+          <h3 style="margin-bottom:16px;">Mijn sollicitaties</h3>
+          {% if sollicitaties %}
+            {% for s in sollicitaties %}
+              <div class="data-row">
+                <div class="data-row-header">
+                  <div>
+                    <h3><a href="{{ url_for('opdracht_detail', opdracht_id=s.opdracht_id) }}">{{ s.opdracht_titel }}</a></h3>
+                    <p class="form-note" style="margin:2px 0 0;">Gesolliciteerd op {{ s.aangemaakt_op }}</p>
+                  </div>
+                  <span class="status-badge status-{{ s.status|replace(' ', '-') }}">{{ s.status|capitalize }}</span>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p style="color:var(--ink-soft);">Je hebt nog niet gesolliciteerd op een opdracht. <a href="{{ url_for('opdrachten_lijst') }}">Bekijk de openstaande opdrachten</a>.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+{% endblock %}

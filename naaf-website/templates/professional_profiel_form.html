@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Profiel bewerken — Naaf{% endblock %}
+{% block content %}
+
+  <section style="padding-top:64px; padding-bottom:96px;">
+    <div class="wrap" style="max-width:640px;">
+      <a href="{{ url_for('professional_dashboard') }}" class="form-note" style="display:inline-block;margin-bottom:24px;">Terug naar mijn profiel</a>
+
+      <div class="section-head">
+        <h2>Profiel bewerken</h2>
+      </div>
+
+      {% with messages = get_flashed_messages(with_categories=true, category_filter=['professional-profiel-error']) %}
+        {% for category, message in messages %}
+          <div class="flash error">{{ message }}</div>
+        {% endfor %}
+      {% endwith %}
+
+      <form class="intake-form" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-row">
+          <div class="field">
+            <label for="pp-naam">Volledige naam</label>
+            <input id="pp-naam" name="naam" type="text" required value="{{ professional.naam }}">
+          </div>
+          <div class="field">
+            <label for="pp-telefoon">Telefoonnummer <span class="optional">(optioneel)</span></label>
+            <input id="pp-telefoon" name="telefoon" type="tel" value="{{ professional.telefoon or '' }}">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="pp-linkedin">LinkedIn <span class="optional">(optioneel)</span></label>
+            <input id="pp-linkedin" name="linkedin" type="url" value="{{ professional.linkedin or '' }}">
+          </div>
+          <div class="field">
+            <label for="pp-woonplaats">Woonplaats <span class="optional">(optioneel)</span></label>
+            <input id="pp-woonplaats" name="woonplaats" type="text" value="{{ professional.woonplaats or '' }}">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="pp-vakgebied">Vakgebied</label>
+          <select id="pp-vakgebied" name="vakgebied" required>
+            {% for optie in ["Software development","Cloud & infrastructuur","Cybersecurity","Data & AI","IT-support & systeembeheer","Projectmanagement & consultancy","Anders"] %}
+              <option value="{{ optie }}" {{ 'selected' if professional.vakgebied == optie else '' }}>{{ optie }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="pp-ervaring">Jaren ervaring <span class="optional">(optioneel)</span></label>
+            <input id="pp-ervaring" name="ervaring" type="text" value="{{ professional.ervaring or '' }}">
+          </div>
+          <div class="field">
+            <label for="pp-beschikbaarheid">Beschikbaar vanaf <span class="optional">(optioneel)</span></label>
+            <input id="pp-beschikbaarheid" name="beschikbaarheid" type="date" value="{{ professional.beschikbaarheid or '' }}">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Wat voor werk zoek je?</label>
+          <div class="form-row" style="margin-top:6px;">
+            {% for waarde, label in [('zzp','Alleen zzp-opdrachten'), ('detachering','Alleen detachering'), ('beide','Beide, maakt niet uit')] %}
+              <label class="functie-option" style="border:1.5px solid var(--line); border-radius:var(--radius-s); padding:10px 14px;">
+                <input type="radio" name="voorkeur" value="{{ waarde }}" style="width:auto;" {{ 'checked' if professional.voorkeur == waarde else '' }}> <span>{{ label }}</span>
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="pp-tags-field">Vaardigheden &amp; kenmerken <span class="optional">(optioneel)</span></label>
+          <p class="form-note" style="margin:0 0 8px;">Typ en druk op Enter of komma om een tag toe te voegen.</p>
+          <div class="tag-input-box" id="pp-tags-box">
+            <input type="text" class="tag-input-field" id="pp-tags-field" placeholder="Typ en druk op Enter...">
+          </div>
+          <input type="hidden" name="tags" id="pp-tags-hidden" value="{{ professional.tags|join(',') }}">
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="pp-cv">CV vervangen <span class="optional">(laat leeg om je huidige cv te behouden)</span></label>
+            <input id="pp-cv" name="cv" type="file" accept=".pdf,.doc,.docx">
+            {% if professional.cv_originele_naam %}<p class="form-note" style="margin:2px 0 0;">Huidig bestand: {{ professional.cv_originele_naam }}</p>{% endif %}
+          </div>
+          <div class="field">
+            <label for="pp-foto">Profielfoto vervangen <span class="optional">(optioneel)</span></label>
+            <input id="pp-foto" name="profielfoto" type="file" accept=".jpg,.jpeg,.png,.webp">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="pp-toelichting">Vertel kort iets over jezelf <span class="optional">(optioneel)</span></label>
+          <textarea id="pp-toelichting" name="toelichting">{{ professional.toelichting or '' }}</textarea>
+        </div>
+
+        <button type="submit" class="btn btn-blue">Wijzigingen opslaan</button>
+      </form>
+    </div>
+  </section>
+
+  <script>
+    // Bestaande tags voorladen in het tag-invulwidget
+    document.addEventListener('DOMContentLoaded', () => {
+      const hidden = document.getElementById('pp-tags-hidden');
+      const box = document.getElementById('pp-tags-box');
+      const input = document.getElementById('pp-tags-field');
+      if (hidden.value) {
+        hidden.value.split(',').filter(Boolean).forEach((tag) => {
+          const pill = document.createElement('span');
+          pill.className = 'tag-pill';
+          const label = document.createElement('span');
+          label.textContent = tag;
+          const remove = document.createElement('button');
+          remove.type = 'button';
+          remove.textContent = '×';
+          remove.addEventListener('click', () => {
+            pill.remove();
+            hidden.value = Array.from(box.querySelectorAll('.tag-pill span:first-child')).map(el => el.textContent).join(',');
+          });
+          pill.appendChild(label);
+          pill.appendChild(remove);
+          box.insertBefore(pill, input);
+        });
+      }
+    });
+  </script>
+
+{% endblock %}

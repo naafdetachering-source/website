@@ -1,0 +1,8 @@
+naaf-website/.env
+naaf-website/naaf.db
+naaf-website/uploads/cvs/*
+!naaf-website/uploads/cvs/.gitkeep
+naaf-website/__pycache__/
+naaf-website/venv/
+venv/
+*.pyc

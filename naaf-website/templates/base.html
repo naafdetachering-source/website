@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Naaf — De juiste ICT'er. Op het juiste moment.{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap nav">
+    <a href="{{ url_for('index') }}#top" class="brand">
+      <svg class="brand-mark" viewBox="0 0 26 26" fill="none">
+        <circle cx="6" cy="13" r="5" fill="#2F5BFF"/>
+        <circle cx="20" cy="13" r="5" fill="#F2A93C"/>
+        <line x1="11" y1="13" x2="15" y2="13" stroke="#12141c" stroke-width="2"/>
+      </svg>
+      <span class="brand-name">Naaf</span>
+    </a>
+    <nav class="links">
+      <a href="{{ url_for('opdrachten_lijst') }}">Opdrachten</a>
+      <a href="{{ url_for('index') }}#hoe-het-werkt">Hoe het werkt</a>
+      <a href="{{ url_for('index') }}#bedrijven">Voor bedrijven</a>
+      <a href="{{ url_for('index') }}#professionals">Voor ICT'ers</a>
+      <a href="{{ url_for('index') }}#faq">Veelgestelde vragen</a>
+    </nav>
+    <div class="nav-cta">
+      {% if session.is_admin %}
+        <a href="{{ url_for('admin_account') }}" class="profile-pill">
+          <span class="profile-avatar">A</span> Beheer
+        </a>
+        <a href="{{ url_for('admin_logout') }}" class="subtle-link">Uitloggen</a>
+      {% elif session.professional_id %}
+        <a href="{{ url_for('professional_dashboard') }}" class="profile-pill">
+          <span class="profile-avatar">👤</span> Mijn profiel
+        </a>
+        <a href="{{ url_for('admin_logout') }}" class="subtle-link">Uitloggen</a>
+      {% else %}
+        <a href="{{ url_for('admin_login') }}" class="subtle-link">Inloggen</a>
+        <a href="{{ url_for('index') }}#bedrijven" class="btn btn-blue">Plaats een aanvraag</a>
+      {% endif %}
+    </div>
+    <button class="menu-toggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+  {% with messages = get_flashed_messages(with_categories=true, category_filter=['form-error']) %}
+    {% if messages %}
+      <div class="wrap" style="padding-top:20px;">
+        {% for category, message in messages %}
+          <div class="flash error">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="{{ url_for('index') }}#top" class="brand">
+          <svg class="brand-mark" viewBox="0 0 26 26" fill="none">
+            <circle cx="6" cy="13" r="5" fill="#2F5BFF"/>
+            <circle cx="20" cy="13" r="5" fill="#F2A93C"/>
+            <line x1="11" y1="13" x2="15" y2="13" stroke="#12141c" stroke-width="2"/>
+          </svg>
+          <span class="brand-name">Naaf</span>
+        </a>
+        <p>Naaf verbindt Nederlandse bedrijven met gekwalificeerde ICT-professionals. Persoonlijk en zonder gedoe.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Voor bedrijven</h4>
+        <ul>
+          <li><a href="{{ url_for('index') }}#bedrijven">Plaats een aanvraag</a></li>
+          <li><a href="{{ url_for('index') }}#hoe-het-werkt">Hoe het werkt</a></li>
+          <li><a href="{{ url_for('index') }}#faq">Tarieven &amp; voorwaarden</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Voor professionals</h4>
+        <ul>
+          <li><a href="{{ url_for('opdrachten_lijst') }}">Bekijk opdrachten</a></li>
+          <li><a href="{{ url_for('index') }}#professionals">Meld je aan</a></li>
+          <li><a href="{{ url_for('index') }}#faq">Veelgestelde vragen</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="mailto:{{ contact_email }}">{{ contact_email }}</a></li>
+          <li><a href="tel:+31201234567">020 - 123 45 67</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Naaf. Alle rechten voorbehouden.</span>
+      <span>KvK 00000000 · Amsterdam</span>
+      <a href="{{ url_for('admin_login') }}" style="color:var(--ink-soft); text-decoration:none;">Beheer</a>
+    </div>
+  </div>
+</footer>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

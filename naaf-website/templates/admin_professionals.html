@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Professionals — Naaf beheer{% endblock %}
+{% block content %}
+
+  <section style="padding-top:24px; padding-bottom:96px;">
+    <div class="wrap">
+      {% include "_admin_nav.html" %}
+
+      <div class="section-head" style="margin-top:24px;">
+        <h2>Aangemelde ICT-professionals</h2>
+        <p>Dit zijn de professionals die zich via het formulier op de homepage hebben aangemeld.</p>
+      </div>
+
+      {% with messages = get_flashed_messages(with_categories=true, category_filter=['admin-success','admin-error']) %}
+        {% for category, message in messages %}
+          <div class="flash {{ 'success' if category == 'admin-success' else 'error' }}">{{ message }}</div>
+        {% endfor %}
+      {% endwith %}
+
+      <form method="get" class="filter-bar">
+        <select name="vakgebied" onchange="this.form.submit()">
+          <option value="">Alle vakgebieden</option>
+          {% for v in vakgebieden %}
+            <option value="{{ v }}" {{ 'selected' if v == actieve_filter else '' }}>{{ v }}</option>
+          {% endfor %}
+        </select>
+        {% if actieve_filter %}
+          <a href="{{ url_for('admin_professionals') }}" class="btn btn-outline">Filter wissen</a>
+        {% endif %}
+      </form>
+
+      {% if professionals %}
+        {% for p in professionals %}
+          <div class="data-row">
+            <div class="data-row-header">
+              <div style="display:flex; gap:14px; align-items:center;">
+                {% if p.profielfoto_bestandsnaam %}
+                  <img src="{{ url_for('admin_professional_foto', professional_id=p.id) }}" alt="" class="professional-photo">
+                {% endif %}
+                <div>
+                  <h3><a href="{{ url_for('admin_professional_detail', professional_id=p.id) }}">{{ p.naam }}</a></h3>
+                  <p class="form-note" style="margin:2px 0 0;">{{ p.aangemaakt_op }}</p>
+                </div>
+              </div>
+              <div style="display:flex; gap:8px;">
+                {% if p.cv_bestandsnaam %}
+                  <a href="{{ url_for('admin_download_professional_cv', professional_id=p.id) }}" target="_blank" rel="noopener" class="btn btn-outline" style="padding:8px 16px; font-size:0.85rem;">Bekijk cv</a>
+                  <a href="{{ url_for('admin_download_professional_cv', professional_id=p.id, download=1) }}" class="btn btn-outline" style="padding:8px 16px; font-size:0.85rem;">Downloaden</a>
+                {% endif %}
+                <form method="post" action="{{ url_for('admin_professional_verwijderen', professional_id=p.id) }}" class="inline-form" onsubmit="return confirm('Deze aanmelding definitief verwijderen?');">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn btn-outline" style="padding:8px 16px; font-size:0.85rem;">Verwijderen</button>
+                </form>
+              </div>
+            </div>
+            <div class="data-row-meta">
+              <span><strong>Vakgebied:</strong> {{ p.vakgebied }}</span>
+              <span><strong>Voorkeur:</strong> {{ p.voorkeur }}</span>
+              <span><strong>E-mail:</strong> <a href="mailto:{{ p.email }}">{{ p.email }}</a></span>
+              {% if p.telefoon %}<span><strong>Telefoon:</strong> {{ p.telefoon }}</span>{% endif %}
+              {% if p.linkedin %}<span><strong>LinkedIn:</strong> <a href="{{ p.linkedin }}" target="_blank" rel="noopener">bekijk profiel</a></span>{% endif %}
+              {% if p.woonplaats %}<span><strong>Woonplaats:</strong> {{ p.woonplaats }}</span>{% endif %}
+              {% if p.ervaring %}<span><strong>Ervaring:</strong> {{ p.ervaring }}</span>{% endif %}
+              {% if p.beschikbaarheid %}<span><strong>Beschikbaar vanaf:</strong> {{ p.beschikbaarheid }}</span>{% endif %}
+            </div>
+            {% if p.tags %}
+              <div class="tag-list-display">
+                {% for tag in p.tags %}<span class="tag-chip">{{ tag }}</span>{% endfor %}
+              </div>
+            {% endif %}
+            {% if p.toelichting %}<p style="margin-top:10px;">{{ p.toelichting }}</p>{% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <p style="color:var(--ink-soft);">Geen aanmeldingen gevonden{{ ' voor dit vakgebied' if actieve_filter else '' }}.</p>
+      {% endif %}
+    </div>
+  </section>
+
+{% endblock %}

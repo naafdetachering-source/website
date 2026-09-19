@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Opdrachten beheren — Naaf{% endblock %}
+{% block content %}
+
+  <section style="padding-top:24px;">
+    <div class="wrap">
+      {% include "_admin_nav.html" %}
+
+      <div class="section-head" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:20px; margin-top:24px;">
+        <div>
+          <h2>Opdrachten beheren</h2>
+          <p>Hier plaats je de opdrachten die je van bedrijven ontvangt, en bekijk je wie erop gesolliciteerd heeft.</p>
+        </div>
+        <a href="{{ url_for('admin_opdracht_nieuw') }}" class="btn btn-blue">Nieuwe opdracht plaatsen</a>
+      </div>
+
+      {% with messages = get_flashed_messages(with_categories=true, category_filter=['admin-success','admin-error']) %}
+        {% for category, message in messages %}
+          <div class="flash {{ 'success' if category == 'admin-success' else 'error' }}">{{ message }}</div>
+        {% endfor %}
+      {% endwith %}
+
+      <form method="get" class="filter-bar">
+        <select name="functiegebied" onchange="this.form.submit()">
+          <option value="">Alle functiegebieden</option>
+          {% for f in functiegebieden %}
+            <option value="{{ f }}" {{ 'selected' if f == actieve_functiegebied else '' }}>{{ f }}</option>
+          {% endfor %}
+        </select>
+        <select name="status" onchange="this.form.submit()">
+          <option value="" {{ 'selected' if not actieve_status else '' }}>Alle statussen</option>
+          <option value="open" {{ 'selected' if actieve_status == 'open' else '' }}>Open</option>
+          <option value="offline" {{ 'selected' if actieve_status == 'offline' else '' }}>Offline</option>
+        </select>
+        <select name="deadline" onchange="this.form.submit()">
+          <option value="" {{ 'selected' if not actieve_deadline else '' }}>Alle deadlines</option>
+          <option value="urgent" {{ 'selected' if actieve_deadline == 'urgent' else '' }}>Bijna/verstreken (rood/oranje)</option>
+          <option value="ruim" {{ 'selected' if actieve_deadline == 'ruim' else '' }}>Ruim op tijd (groen)</option>
+          <option value="geen" {{ 'selected' if actieve_deadline == 'geen' else '' }}>Geen deadline ingesteld</option>
+        </select>
+        {% if actieve_functiegebied or actieve_status or actieve_deadline %}
+          <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline">Filters wissen</a>
+        {% endif %}
+      </form>
+
+      {% if opdrachten %}
+        <div class="job-list">
+          {% for opdracht in opdrachten %}
+            <div class="job-row" style="cursor:default;">
+              <div class="job-row-main">
+                <span class="job-tag">{{ opdracht['functiegebied'] }}</span>
+                {% if not opdracht['actief'] %}<span class="job-tag job-tag-inactive">Offline</span>{% endif %}
+                {% if opdracht['deadline_info'] %}
+                  {% if opdracht['deadline_info'].verstreken %}
+                    <span class="job-tag deadline-rood">Deadline verstreken</span>
+                  {% else %}
+                    <span class="job-tag deadline-{{ opdracht['deadline_info'].kleur }}">Nog {{ opdracht['deadline_info'].dagen }} dag(en) om te solliciteren</span>
+                  {% endif %}
+                {% endif %}
+                <h3>{{ opdracht['titel'] }}</h3>
+                <p>{{ opdracht['samenvatting'] }}</p>
+                <p class="form-note" style="margin-top:6px;">
+                  Aangemaakt op {{ opdracht['aangemaakt_op'][:10] }}
+                  {% if opdracht['sollicitatie_deadline'] %} · Sollicitatiedeadline: {{ opdracht['sollicitatie_deadline'] }}{% endif %}
+                </p>
+                {% if opdracht['notities'] %}<p class="form-note" style="margin-top:6px;">📝 {{ opdracht['notities'] }}</p>{% endif %}
+              </div>
+              <div class="job-row-meta" style="align-items:flex-end;">
+                <span>{{ opdracht['aantal_sollicitaties'] }} sollicitatie(s)</span>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                  <a href="{{ url_for('admin_sollicitaties', opdracht_id=opdracht['id']) }}" class="btn btn-outline" style="padding:8px 16px; font-size:0.85rem;">Bekijk sollicitaties</a>
+                  <a href="{{ url_for('admin_opdracht_wijzigen', opdracht_id=opdracht['id']) }}" class="btn btn-outline" style="padding:8px 16px; font-size:0.85rem;">Wijzigen</a>
+                  <a href="{{ url_for('opdracht_detail', opdracht_id=opdracht['id']) }}" class="btn btn-outline" style="padding:8px 16px; font-size:0.85rem;">Bekijk live</a>
+                  <form method="post" action="{{ url_for('admin_opdracht_toggle', opdracht_id=opdracht['id']) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-outline" style="padding:8px 16px; font-size:0.85rem;">
+                      {{ 'Zet online' if not opdracht['actief'] else 'Zet offline' }}
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p style="color:var(--ink-soft);">{{ 'Geen opdrachten gevonden met deze filters.' if actieve_functiegebied or actieve_status or actieve_deadline else 'Er zijn nog geen opdrachten geplaatst.' }}</p>
+      {% endif %}
+    </div>
+  </section>
+
+{% endblock %}

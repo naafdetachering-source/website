@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Sollicitaties — {{ opdracht['titel'] }}{% endblock %}
+{% block content %}
+
+  <section style="padding-top:24px; padding-bottom:96px;">
+    <div class="wrap" style="max-width:820px;">
+      {% include "_admin_nav.html" %}
+
+      <a href="{{ url_for('admin_dashboard') }}" class="form-note" style="display:inline-block;margin:24px 0;">Alle opdrachten</a>
+
+      {% with messages = get_flashed_messages(with_categories=true, category_filter=['admin-success','admin-error']) %}
+        {% for category, message in messages %}
+          <div class="flash {{ 'success' if category == 'admin-success' else 'error' }}">{{ message }}</div>
+        {% endfor %}
+      {% endwith %}
+
+      <div class="section-head" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:16px;">
+        <div>
+          <h2>Sollicitaties op: {{ opdracht['titel'] }}</h2>
+          <p>{{ sollicitaties|length }} sollicitatie(s) ontvangen.</p>
+        </div>
+        <a href="{{ url_for('admin_sollicitatie_nieuw', opdracht_id=opdracht['id']) }}" class="btn btn-blue">Sollicitatie toevoegen</a>
+      </div>
+
+      {% if sollicitaties %}
+        {% for s in sollicitaties %}
+          <div class="applicant-card">
+            <div class="applicant-header">
+              <div>
+                <h3>{{ s.naam }}</h3>
+                <p class="form-note">{{ s.aangemaakt_op }}</p>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                <form method="post" action="{{ url_for('admin_sollicitatie_status', sollicitatie_id=s.id) }}" class="inline-form">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <select name="status" onchange="this.form.submit()" class="status-select status-{{ s.status|replace(' ', '-') }}">
+                    {% for status in ['in behandeling', 'gaat door', 'afgewezen'] %}
+                      <option value="{{ status }}" {{ 'selected' if s.status == status else '' }}>{{ status|capitalize }}</option>
+                    {% endfor %}
+                  </select>
+                </form>
+                <a href="{{ url_for('admin_download_cv', sollicitatie_id=s.id) }}" target="_blank" rel="noopener" class="btn btn-outline" style="padding:8px 16px; font-size:0.85rem;">Bekijk cv</a>
+                <a href="{{ url_for('admin_download_cv', sollicitatie_id=s.id, download=1) }}" class="btn btn-outline" style="padding:8px 16px; font-size:0.85rem;">Downloaden</a>
+                <a href="{{ url_for('admin_sollicitatie_wijzigen', sollicitatie_id=s.id) }}" class="btn btn-outline" style="padding:8px 16px; font-size:0.85rem;">Wijzigen</a>
+                <form method="post" action="{{ url_for('admin_sollicitatie_verwijderen', sollicitatie_id=s.id) }}" class="inline-form" onsubmit="return confirm('Deze sollicitatie definitief verwijderen?');">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn btn-outline" style="padding:8px 16px; font-size:0.85rem;">Verwijderen</button>
+                </form>
+              </div>
+            </div>
+
+            <div class="applicant-meta">
+              <span><strong>E-mail:</strong> <a href="mailto:{{ s.email }}">{{ s.email }}</a></span>
+              {% if s.telefoon %}<span><strong>Telefoon:</strong> {{ s.telefoon }}</span>{% endif %}
+              {% if s.linkedin %}<span><strong>LinkedIn:</strong> <a href="{{ s.linkedin }}" target="_blank" rel="noopener">{{ s.linkedin }}</a></span>{% endif %}
+              {% if s.functies %}<span><strong>Functie(s):</strong> {{ s.functies|join(', ') }}</span>{% endif %}
+            </div>
+
+            <p><strong>Motivatie</strong><br>{{ s.motivatie }}</p>
+
+            {% if s.eis_antwoorden %}
+              <p><strong>Antwoorden op de eisen</strong></p>
+              <ul class="req-list">
+                {% for a in s.eis_antwoorden %}
+                  <li><em>{{ a.vraag }}</em><br>{{ a.antwoord }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+
+            {% if s.wens_antwoorden %}
+              <p><strong>Antwoorden op de wensen</strong></p>
+              <ul class="req-list">
+                {% for a in s.wens_antwoorden %}
+                  {% if a.antwoord %}<li><em>{{ a.vraag }}</em><br>{{ a.antwoord }}</li>{% endif %}
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <p style="color:var(--ink-soft);">Er zijn nog geen sollicitaties binnengekomen op deze opdracht.</p>
+      {% endif %}
+    </div>
+  </section>
+
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Opdrachten — Naaf{% endblock %}
+{% block content %}
+
+  <section style="padding-top:64px;">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Openstaande opdrachten</h2>
+        <p>Een overzicht van de actuele opdrachten die bedrijven bij Naaf hebben aangemeld. Klik op een opdracht voor de volledige omschrijving en om te solliciteren.</p>
+      </div>
+
+      {% if opdrachten %}
+        <div class="job-list">
+          {% for opdracht in opdrachten %}
+            <a class="job-row" href="{{ url_for('opdracht_detail', opdracht_id=opdracht['id']) }}">
+              <div class="job-row-main">
+                <span class="job-tag">{{ opdracht['functiegebied'] }}</span>
+                {% if opdracht['deadline_info'] %}
+                  {% if opdracht['deadline_info'].verstreken %}
+                    <span class="job-tag deadline-rood">Deadline verstreken</span>
+                  {% else %}
+                    <span class="job-tag deadline-{{ opdracht['deadline_info'].kleur }}">Nog {{ opdracht['deadline_info'].dagen }} dag(en) om te solliciteren</span>
+                  {% endif %}
+                {% endif %}
+                <h3>{{ opdracht['titel'] }}</h3>
+                <p>{{ opdracht['samenvatting'] }}</p>
+              </div>
+              <div class="job-row-meta">
+                {% if opdracht['locatie'] %}<span>{{ opdracht['locatie'] }}</span>{% endif %}
+                {% if opdracht['uren'] %}<span>{{ opdracht['uren'] }}</span>{% endif %}
+                {% if opdracht['duur'] %}<span>{{ opdracht['duur'] }}</span>{% endif %}
+                {% if opdracht['sollicitatie_deadline'] %}<span>Solliciteer vóór {{ opdracht['sollicitatie_deadline'] }}</span>{% endif %}
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p style="color:var(--ink-soft);">Er staan op dit moment geen opdrachten open. Meld je aan als professional via de homepage, dan nemen we contact op zodra er een passende opdracht is.</p>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="final-cta">
+    <div class="wrap final-cta-inner">
+      <h2>Zelf een opdracht uit te zetten?</h2>
+      <div class="final-cta-ctas">
+        <a href="{{ url_for('index') }}#bedrijven" class="btn" style="background:#fff;color:var(--blue-deep);">Plaats een aanvraag</a>
+      </div>
+    </div>
+  </section>
+
+{% endblock %}

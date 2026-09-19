@@ -1,0 +1,7 @@
+<div class="admin-subnav">
+  <a href="{{ url_for('admin_account') }}" class="{{ 'active' if request.endpoint == 'admin_account' }}">Mijn account</a>
+  <a href="{{ url_for('admin_dashboard') }}" class="{{ 'active' if request.endpoint == 'admin_dashboard' }}">Opdrachten</a>
+  <a href="{{ url_for('admin_aanvragen') }}" class="{{ 'active' if request.endpoint == 'admin_aanvragen' }}">Aanvragen (bedrijven)</a>
+  <a href="{{ url_for('admin_professionals') }}" class="{{ 'active' if request.endpoint == 'admin_professionals' }}">Professionals</a>
+  <a href="{{ url_for('admin_logout') }}" class="admin-subnav-logout">Uitloggen</a>
+</div>

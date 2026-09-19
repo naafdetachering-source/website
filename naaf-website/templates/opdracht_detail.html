@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}{{ opdracht['titel'] }} — Naaf{% endblock %}
+{% block content %}
+
+  <section style="padding-top:64px; padding-bottom:56px;">
+    <div class="wrap" style="max-width:820px;">
+      <a href="{{ url_for('opdrachten_lijst') }}" class="form-note" style="display:inline-block;margin-bottom:24px;">Alle opdrachten</a>
+
+      <span class="job-tag">{{ opdracht['functiegebied'] }}</span>
+      {% if deadline_info %}
+        {% if deadline_info.verstreken %}
+          <span class="job-tag deadline-rood">Deadline verstreken</span>
+        {% else %}
+          <span class="job-tag deadline-{{ deadline_info.kleur }}">Nog {{ deadline_info.dagen }} dag(en) om te solliciteren</span>
+        {% endif %}
+      {% endif %}
+      <h1 style="margin-top:16px; font-size:clamp(1.8rem,3vw,2.4rem);">{{ opdracht['titel'] }}</h1>
+
+      <div class="job-row-meta" style="margin-top:16px; margin-bottom:36px;">
+        {% if opdracht['locatie'] %}<span>{{ opdracht['locatie'] }}</span>{% endif %}
+        {% if opdracht['uren'] %}<span>{{ opdracht['uren'] }}</span>{% endif %}
+        {% if opdracht['startdatum'] %}<span>Start: {{ opdracht['startdatum'] }}</span>{% endif %}
+        {% if opdracht['duur'] %}<span>{{ opdracht['duur'] }}</span>{% endif %}
+        {% if opdracht['tarief_indicatie'] %}<span>Tarief: {{ opdracht['tarief_indicatie'] }}</span>{% endif %}
+        {% if opdracht['sollicitatie_deadline'] %}<span>Solliciteer vóór: {{ opdracht['sollicitatie_deadline'] }}</span>{% endif %}
+      </div>
+
+      {% for alinea in opdracht['omschrijving'].split('\n\n') %}
+        <p style="color:var(--ink-soft); margin-bottom:16px;">{{ alinea }}</p>
+      {% endfor %}
+
+      {% if eisen %}
+        <h3 style="margin-top:32px; margin-bottom:14px; font-size:1.15rem;">Eisen</h3>
+        <ul class="req-list">
+          {% for eis in eisen %}<li>{{ eis }}</li>{% endfor %}
+        </ul>
+      {% endif %}
+
+      {% if wensen %}
+        <h3 style="margin-top:28px; margin-bottom:14px; font-size:1.15rem;">Wensen</h3>
+        <ul class="req-list">
+          {% for wens in wensen %}<li>{{ wens }}</li>{% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+  </section>
+
+  <section id="solliciteren" style="background:var(--surface); border-top:1px solid var(--line); padding-top:64px;">
+    <div class="wrap" style="max-width:820px;">
+      <div class="section-head">
+        <h2>Solliciteer op deze opdracht</h2>
+        <p>Vul onderstaand formulier in. We nemen persoonlijk contact met je op zodra we je sollicitatie hebben bekeken.</p>
+      </div>
+
+      {% with messages = get_flashed_messages(with_categories=true, category_filter=['sollicitatie-success','sollicitatie-error']) %}
+        {% for category, message in messages %}
+          <div class="flash {{ 'success' if category == 'sollicitatie-success' else 'error' }}">{{ message }}</div>
+        {% endfor %}
+      {% endwith %}
+
+      <form class="intake-form" method="post" enctype="multipart/form-data"
+            action="{{ url_for('opdracht_solliciteren', opdracht_id=opdracht['id']) }}#solliciteren">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-row">
+          <div class="field">
+            <label for="s-naam">Naam</label>
+            <input id="s-naam" name="naam" type="text" required>
+          </div>
+          <div class="field">
+            <label for="s-email">E-mail</label>
+            <input id="s-email" name="email" type="email" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="s-telefoon">Telefoon <span class="optional">(optioneel)</span></label>
+            <input id="s-telefoon" name="telefoon" type="tel">
+          </div>
+          <div class="field">
+            <label for="s-linkedin">LinkedIn <span class="optional">(optioneel)</span></label>
+            <input id="s-linkedin" name="linkedin" type="url" placeholder="https://www.linkedin.com/in/naam">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Functie(s)</label>
+          <p class="form-note" style="margin:0 0 8px;">Je kunt maximaal {{ max_functies }} functies selecteren.</p>
+          <div class="functie-list" data-max="{{ max_functies }}">
+            {% for functie in functies %}
+              <label class="functie-option">
+                <input type="checkbox" name="functies" value="{{ functie }}" class="functie-checkbox">
+                <span>{{ functie }}</span>
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="s-cv">CV uploaden</label>
+          <input id="s-cv" name="cv" type="file" accept=".pdf,.doc,.docx" required>
+          <p class="form-note" style="margin:2px 0 0;">PDF, DOC of DOCX, max. 8 MB.</p>
+        </div>
+
+        <div class="field">
+          <label for="s-motivatie">Motivatie</label>
+          <textarea id="s-motivatie" name="motivatie" required placeholder="Vertel waarom deze opdracht bij je past."></textarea>
+        </div>
+
+        {% if eisen %}
+          <div class="field">
+            <label>Beantwoord de eisen</label>
+            <p class="form-note" style="margin:0 0 8px;">Licht per eis kort en concreet toe hoe je hieraan voldoet. Beschrijf waar, wanneer en in welke rol je deze ervaring hebt opgedaan, het liefst met een kort praktijkvoorbeeld.</p>
+          </div>
+          {% for eis in eisen %}
+            <div class="field">
+              <label for="s-eis-{{ loop.index0 }}">Eis {{ loop.index }}: {{ eis }}</label>
+              <textarea id="s-eis-{{ loop.index0 }}" name="eis_{{ loop.index0 }}" required></textarea>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        {% if wensen %}
+          <div class="field">
+            <label>Beantwoord de wensen <span class="optional">(optioneel)</span></label>
+            <p class="form-note" style="margin:0 0 8px;">Licht per wens kort en concreet toe hoe je hieraan voldoet.</p>
+          </div>
+          {% for wens in wensen %}
+            <div class="field">
+              <label for="s-wens-{{ loop.index0 }}">Wens {{ loop.index }}: {{ wens }}</label>
+              <textarea id="s-wens-{{ loop.index0 }}" name="wens_{{ loop.index0 }}"></textarea>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <button type="submit" class="btn btn-blue">Solliciteer</button>
+        <p class="form-note">Verplichte velden. Liever direct mailen? Stuur je gegevens naar <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>.</p>
+      </form>
+    </div>
+  </section>
+
+{% endblock %}

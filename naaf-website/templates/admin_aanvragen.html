@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Aanvragen van bedrijven — Naaf beheer{% endblock %}
+{% block content %}
+
+  <section style="padding-top:24px; padding-bottom:96px;">
+    <div class="wrap">
+      {% include "_admin_nav.html" %}
+
+      <div class="section-head" style="margin-top:24px;">
+        <h2>Aanvragen van bedrijven</h2>
+        <p>Dit zijn de aanvragen die bedrijven rechtstreeks via het formulier op de homepage hebben ingediend.</p>
+      </div>
+
+      {% with messages = get_flashed_messages(with_categories=true, category_filter=['admin-success','admin-error']) %}
+        {% for category, message in messages %}
+          <div class="flash {{ 'success' if category == 'admin-success' else 'error' }}">{{ message }}</div>
+        {% endfor %}
+      {% endwith %}
+
+      {% if aanvragen %}
+        {% for a in aanvragen %}
+          <div class="data-row">
+            <div class="data-row-header">
+              <div>
+                <h3>{{ a.bedrijfsnaam }}</h3>
+                <p class="form-note" style="margin:2px 0 0;">{{ a.aangemaakt_op }}</p>
+              </div>
+              <form method="post" action="{{ url_for('admin_aanvraag_verwijderen', aanvraag_id=a.id) }}" class="inline-form" onsubmit="return confirm('Deze aanvraag definitief verwijderen?');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-outline" style="padding:8px 16px; font-size:0.85rem;">Verwijderen</button>
+              </form>
+            </div>
+            <div class="data-row-meta">
+              <span><strong>Contactpersoon:</strong> {{ a.contactpersoon }}</span>
+              <span><strong>E-mail:</strong> <a href="mailto:{{ a.email }}">{{ a.email }}</a></span>
+              {% if a.telefoon %}<span><strong>Telefoon:</strong> {{ a.telefoon }}</span>{% endif %}
+              <span><strong>Gezocht:</strong> {{ a.functie }}</span>
+              {% if a.startdatum %}<span><strong>Startdatum:</strong> {{ a.startdatum }}</span>{% endif %}
+              {% if a.duur %}<span><strong>Duur:</strong> {{ a.duur }}</span>{% endif %}
+            </div>
+            {% if a.toelichting %}<p>{{ a.toelichting }}</p>{% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <p style="color:var(--ink-soft);">Er zijn nog geen aanvragen binnengekomen.</p>
+      {% endif %}
+    </div>
+  </section>
+
+{% endblock %}

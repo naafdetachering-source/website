@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Status van je sollicitatie — Naaf{% endblock %}
+{% block content %}
+
+  <section style="padding-top:80px; padding-bottom:96px;">
+    <div class="wrap" style="max-width:600px;">
+      <div class="section-head">
+        <h2>Status van je sollicitatie</h2>
+        <p>Opdracht: <strong>{{ opdracht['titel'] }}</strong></p>
+      </div>
+
+      <div class="applicant-card">
+        <p style="margin-bottom:16px;">Hoi {{ sollicitatie['naam'] }}, dit is de huidige status van je sollicitatie:</p>
+
+        <span class="status-badge status-{{ sollicitatie['status']|replace(' ', '-') }}" style="font-size:1rem; padding:10px 18px;">
+          {{ sollicitatie['status']|capitalize }}
+        </span>
+
+        <p class="form-note" style="margin-top:20px;">
+          {% if sollicitatie['status'] == 'in behandeling' %}
+            We bekijken je sollicitatie nog. Zodra daar verandering in komt, zie je dat hier terug — je hoeft niet zelf te informeren.
+          {% elif sollicitatie['status'] == 'gaat door' %}
+            Goed nieuws — je sollicitatie gaat door naar de volgende stap. We nemen persoonlijk contact met je op.
+          {% elif sollicitatie['status'] == 'afgewezen' %}
+            Deze keer is er helaas geen match. Bedankt voor je interesse — kijk gerust of er een andere opdracht bij je past.
+          {% endif %}
+        </p>
+
+        <p class="form-note" style="margin-top:20px;">Sollicitatie ingediend op {{ sollicitatie['aangemaakt_op'] }}.</p>
+      </div>
+
+      <a href="{{ url_for('opdrachten_lijst') }}" class="btn btn-outline" style="margin-top:24px;">Bekijk andere opdrachten</a>
+    </div>
+  </section>
+
+{% endblock %}

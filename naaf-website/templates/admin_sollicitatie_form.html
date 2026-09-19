@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Sollicitatie toevoegen' if modus == 'nieuw' else 'Sollicitatie wijzigen' }} — Naaf beheer{% endblock %}
+{% block content %}
+
+  <section style="padding-top:24px; padding-bottom:96px;">
+    <div class="wrap" style="max-width:720px;">
+      {% include "_admin_nav.html" %}
+
+      <a href="{{ url_for('admin_sollicitaties', opdracht_id=opdracht['id']) }}" class="form-note" style="display:inline-block;margin:24px 0;">Terug naar sollicitaties</a>
+
+      <div class="section-head">
+        <h2>{{ 'Sollicitatie toevoegen' if modus == 'nieuw' else 'Sollicitatie wijzigen' }}</h2>
+        <p>Voor de opdracht: <strong>{{ opdracht['titel'] }}</strong></p>
+      </div>
+
+      {% with messages = get_flashed_messages(with_categories=true, category_filter=['admin-error']) %}
+        {% for category, message in messages %}
+          <div class="flash error">{{ message }}</div>
+        {% endfor %}
+      {% endwith %}
+
+      <form class="intake-form" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-row">
+          <div class="field">
+            <label for="s-naam">Naam</label>
+            <input id="s-naam" name="naam" type="text" required value="{{ sollicitatie.naam if sollicitatie else '' }}">
+          </div>
+          <div class="field">
+            <label for="s-email">E-mail</label>
+            <input id="s-email" name="email" type="email" required value="{{ sollicitatie.email if sollicitatie else '' }}">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="s-telefoon">Telefoon <span class="optional">(optioneel)</span></label>
+            <input id="s-telefoon" name="telefoon" type="tel" value="{{ sollicitatie.telefoon if sollicitatie else '' }}">
+          </div>
+          <div class="field">
+            <label for="s-linkedin">LinkedIn <span class="optional">(optioneel)</span></label>
+            <input id="s-linkedin" name="linkedin" type="url" value="{{ sollicitatie.linkedin if sollicitatie else '' }}">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Functie(s)</label>
+          <p class="form-note" style="margin:0 0 8px;">Maximaal {{ max_functies }}.</p>
+          <div class="functie-list" data-max="{{ max_functies }}">
+            {% for functie in functies %}
+              <label class="functie-option">
+                <input type="checkbox" name="functies" value="{{ functie }}" class="functie-checkbox"
+                  {{ 'checked' if sollicitatie and functie in sollicitatie.functies else '' }}>
+                <span>{{ functie }}</span>
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="s-cv">CV {{ '' if modus == 'nieuw' else '(laat leeg om het huidige cv te behouden)' }}</label>
+          <input id="s-cv" name="cv" type="file" accept=".pdf,.doc,.docx" {{ 'required' if modus == 'nieuw' else '' }}>
+          {% if sollicitatie %}<p class="form-note" style="margin:2px 0 0;">Huidig bestand: {{ sollicitatie.cv_originele_naam }}</p>{% endif %}
+        </div>
+
+        <div class="field">
+          <label for="s-motivatie">Motivatie</label>
+          <textarea id="s-motivatie" name="motivatie" required>{{ sollicitatie.motivatie if sollicitatie else '' }}</textarea>
+        </div>
+
+        {% if eisen %}
+          <div class="field"><label>Antwoorden op de eisen <span class="optional">(optioneel bij handmatig invoeren)</span></label></div>
+          {% for eis in eisen %}
+            <div class="field">
+              <label for="s-eis-{{ loop.index0 }}">Eis {{ loop.index }}: {{ eis }}</label>
+              <textarea id="s-eis-{{ loop.index0 }}" name="eis_{{ loop.index0 }}">{{ sollicitatie.eis_antwoorden[loop.index0].antwoord if sollicitatie and sollicitatie.eis_antwoorden|length > loop.index0 else '' }}</textarea>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        {% if wensen %}
+          <div class="field"><label>Antwoorden op de wensen <span class="optional">(optioneel)</span></label></div>
+          {% for wens in wensen %}
+            <div class="field">
+              <label for="s-wens-{{ loop.index0 }}">Wens {{ loop.index }}: {{ wens }}</label>
+              <textarea id="s-wens-{{ loop.index0 }}" name="wens_{{ loop.index0 }}">{{ sollicitatie.wens_antwoorden[loop.index0].antwoord if sollicitatie and sollicitatie.wens_antwoorden|length > loop.index0 else '' }}</textarea>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <button type="submit" class="btn btn-blue">{{ 'Sollicitatie toevoegen' if modus == 'nieuw' else 'Wijzigingen opslaan' }}</button>
+      </form>
+    </div>
+  </section>
+
+{% endblock %}

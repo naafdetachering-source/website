@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Mijn account — Naaf beheer{% endblock %}
+{% block content %}
+
+  <section style="padding-top:24px; padding-bottom:96px;">
+    <div class="wrap">
+      {% include "_admin_nav.html" %}
+
+      <div class="section-head" style="margin-top:24px;">
+        <h2>Welkom terug</h2>
+        <p>Je bent ingelogd als beheerder van Naaf. Hier vind je in één oogopslag hoe het ervoor staat.</p>
+      </div>
+
+      <div class="glance-bar">
+        <div class="glance-stat">
+          <span class="glance-number">{{ totaal_open }}</span>
+          <span class="glance-label">open opdrachten</span>
+        </div>
+        <div class="glance-stat">
+          <span class="glance-number">{{ totaal_in_behandeling }}</span>
+          <span class="glance-label">sollicitaties in behandeling</span>
+        </div>
+        <div class="glance-stat">
+          <span class="glance-number">{{ nieuwe_professionals }}</span>
+          <span class="glance-label">nieuwe professionals deze week</span>
+        </div>
+        <div class="glance-stat {{ 'glance-warning' if deadlines_bijna > 0 else '' }}">
+          <span class="glance-number">{{ deadlines_bijna }}</span>
+          <span class="glance-label">deadline(s) binnen 7 dagen of verstreken</span>
+        </div>
+      </div>
+
+      <div class="account-links">
+        <a href="{{ url_for('admin_dashboard') }}" class="account-link-card">
+          <h3>Opdrachten beheren</h3>
+          <p>Plaats nieuwe opdrachten, wijzig bestaande, en filter op functiegebied, status of deadline.</p>
+        </a>
+        <a href="{{ url_for('admin_aanvragen') }}" class="account-link-card">
+          <h3>Aanvragen van bedrijven</h3>
+          <p>Bekijk alle opdrachtaanvragen die rechtstreeks via het formulier zijn binnengekomen.</p>
+        </a>
+        <a href="{{ url_for('admin_professionals') }}" class="account-link-card">
+          <h3>Professionals</h3>
+          <p>Alle aangemelde ICT'ers, filterbaar op vakgebied, inclusief profiel en cv.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+{% endblock %}

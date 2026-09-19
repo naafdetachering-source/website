@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Opdracht wijzigen' if modus == 'wijzigen' else 'Nieuwe opdracht' }} — Naaf beheer{% endblock %}
+{% block content %}
+
+  <section style="padding-top:24px; padding-bottom:96px;">
+    <div class="wrap" style="max-width:720px;">
+      {% include "_admin_nav.html" %}
+
+      <div class="section-head" style="margin-top:24px;">
+        <h2>{{ 'Opdracht wijzigen' if modus == 'wijzigen' else 'Nieuwe opdracht plaatsen' }}</h2>
+        <p>Vul de gegevens van de opdracht in die je van een bedrijf hebt ontvangen. Zet elke eis en wens op een eigen regel.</p>
+      </div>
+
+      {% with messages = get_flashed_messages(with_categories=true, category_filter=['admin-error','admin-success']) %}
+        {% for category, message in messages %}
+          <div class="flash {{ 'success' if category == 'admin-success' else 'error' }}">{{ message }}</div>
+        {% endfor %}
+      {% endwith %}
+
+      {% if modus != 'wijzigen' %}
+      <div class="ai-fill-box">
+        <h3 style="font-size:1.05rem; margin-bottom:6px;">Automatisch invullen met AI</h3>
+        <p class="form-note" style="margin:0 0 14px;">Plak de vacaturetekst hieronder, of upload de pdf (bijv. van Flextender). De velden worden dan zo goed mogelijk voorgevuld — controleer alles, en vul zelf het tarief in.</p>
+
+        <form class="intake-form" method="post" enctype="multipart/form-data" action="{{ url_for('admin_opdracht_ai_invullen') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="field">
+            <label for="ai-tekst">Vacaturetekst</label>
+            <textarea id="ai-tekst" name="vacaturetekst" placeholder="Plak hier de volledige vacature-/opdrachttekst..." style="min-height:120px;"></textarea>
+          </div>
+          <div class="field">
+            <label for="ai-pdf">Of upload een pdf <span class="optional">(optioneel, i.p.v. plakken)</span></label>
+            <input id="ai-pdf" name="vacature_pdf" type="file" accept=".pdf">
+          </div>
+          <button type="submit" class="btn btn-outline">Vul automatisch in</button>
+        </form>
+      </div>
+      {% endif %}
+
+      <form class="intake-form" method="post" action="{{ url_for('admin_opdracht_wijzigen', opdracht_id=opdracht['id']) if modus == 'wijzigen' else url_for('admin_opdracht_nieuw') }}" style="margin-top:36px;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="field">
+          <label for="o-titel">Titel van de opdracht</label>
+          <input id="o-titel" name="titel" type="text" required placeholder="Bijv. Testcoördinator Acceptatietesten" value="{{ voorinvulling.titel if voorinvulling else '' }}">
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="o-functiegebied">Functiegebied</label>
+            <select id="o-functiegebied" name="functiegebied" required>
+              <option value="" {{ 'disabled selected' if not (voorinvulling and voorinvulling.functiegebied) else '' }}>Kies een functiegebied</option>
+              {% for functie in functies %}
+                <option value="{{ functie }}" {{ 'selected' if voorinvulling and voorinvulling.functiegebied == functie else '' }}>{{ functie }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label for="o-locatie">Locatie <span class="optional">(optioneel)</span></label>
+            <input id="o-locatie" name="locatie" type="text" placeholder="Bijv. Utrecht (hybride)" value="{{ voorinvulling.locatie if voorinvulling else '' }}">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="o-uren">Uren per week <span class="optional">(optioneel)</span></label>
+            <input id="o-uren" name="uren" type="text" placeholder="Bijv. 32-40 uur per week" value="{{ voorinvulling.uren if voorinvulling else '' }}">
+          </div>
+          <div class="field">
+            <label for="o-tarief">Tarief-indicatie <span class="optional">(vul dit altijd zelf in)</span></label>
+            <input id="o-tarief" name="tarief_indicatie" type="text" placeholder="Bijv. In overleg, of €80-95/uur" value="{{ voorinvulling.tarief_indicatie if voorinvulling else '' }}">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="o-startdatum">Gewenste startdatum <span class="optional">(optioneel)</span></label>
+            <input id="o-startdatum" name="startdatum" type="text" placeholder="Bijv. Zo snel mogelijk" value="{{ voorinvulling.startdatum if voorinvulling else '' }}">
+          </div>
+          <div class="field">
+            <label for="o-duur">Verwachte duur <span class="optional">(optioneel)</span></label>
+            <input id="o-duur" name="duur" type="text" placeholder="Bijv. 6 maanden, optie tot verlenging" value="{{ voorinvulling.duur if voorinvulling else '' }}">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="o-deadline">Sollicitatiedeadline <span class="optional">(optioneel, maar sterk aanbevolen)</span></label>
+          <p class="form-note" style="margin:0 0 8px;">Tot wanneer kunnen professionals solliciteren? Verschijnt ook op de opdracht zelf en in je dashboard-overzicht.</p>
+          <input id="o-deadline" name="sollicitatie_deadline" type="date" value="{{ voorinvulling.sollicitatie_deadline if voorinvulling else '' }}">
+        </div>
+
+        <div class="field">
+          <label for="o-samenvatting">Korte samenvatting</label>
+          <p class="form-note" style="margin:0 0 8px;">Deze zin verschijnt op het overzicht van alle opdrachten.</p>
+          <input id="o-samenvatting" name="samenvatting" type="text" required value="{{ voorinvulling.samenvatting if voorinvulling else '' }}">
+        </div>
+
+        <div class="field">
+          <label for="o-omschrijving">Volledige omschrijving</label>
+          <p class="form-note" style="margin:0 0 8px;">Gebruik een lege regel tussen alinea's.</p>
+          <textarea id="o-omschrijving" name="omschrijving" required style="min-height:160px;">{{ voorinvulling.omschrijving if voorinvulling else '' }}</textarea>
+        </div>
+
+        <div class="field">
+          <label for="o-eisen">Eisen</label>
+          <p class="form-note" style="margin:0 0 8px;">Eén eis per regel. Minimaal één eis is verplicht.</p>
+          <textarea id="o-eisen" name="eisen" required style="min-height:120px;" placeholder="Je hebt minimaal vijf jaar ervaring met ...
+Je hebt aantoonbare ervaring met ...">{{ voorinvulling.eisen|join('\n') if voorinvulling else '' }}</textarea>
+        </div>
+
+        <div class="field">
+          <label for="o-wensen">Wensen <span class="optional">(optioneel — laat leeg als er geen wensen zijn)</span></label>
+          <p class="form-note" style="margin:0 0 8px;">Eén wens per regel.</p>
+          <textarea id="o-wensen" name="wensen" style="min-height:120px;">{{ voorinvulling.wensen|join('\n') if voorinvulling else '' }}</textarea>
+        </div>
+
+        <div class="field">
+          <label for="o-notities">Interne notities <span class="optional">(alleen zichtbaar voor jou, nooit publiek)</span></label>
+          <p class="form-note" style="margin:0 0 8px;">Bijv. wie de contactpersoon bij de klant is, bijzonderheden over de opdracht, status van gesprekken.</p>
+          <textarea id="o-notities" name="notities" style="min-height:100px;">{{ voorinvulling.notities if voorinvulling else '' }}</textarea>
+        </div>
+
+        <button type="submit" class="btn btn-blue">{{ 'Wijzigingen opslaan' if modus == 'wijzigen' else 'Opdracht plaatsen' }}</button>
+      </form>
+    </div>
+  </section>
+
+{% endblock %}
