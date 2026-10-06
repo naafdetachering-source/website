@@ -3,19 +3,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const navLinks = document.querySelector('nav.links');
 
   if (menuToggle && navLinks) {
+    const header = document.querySelector('header.site');
+    const setMenu = (open) => {
+      header.classList.toggle('menu-open', open);
+      menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      menuToggle.setAttribute('aria-label', open ? 'Menu sluiten' : 'Menu openen');
+    };
     menuToggle.addEventListener('click', () => {
-      const open = navLinks.style.display === 'flex';
-      navLinks.style.display = open ? 'none' : 'flex';
-      navLinks.style.flexDirection = 'column';
-      navLinks.style.position = 'absolute';
-      navLinks.style.top = '64px';
-      navLinks.style.left = '0';
-      navLinks.style.right = '0';
-      navLinks.style.background = '#f5f6f3';
-      navLinks.style.padding = '20px 24px';
-      navLinks.style.borderBottom = '1px solid #e1e3de';
-      navLinks.style.gap = '18px';
+      setMenu(!header.classList.contains('menu-open'));
     });
+    // Sluit het menu zodra je op een link klikt (bijv. #faq), met Escape, of bij terug naar desktopbreedte
+    navLinks.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
+    window.addEventListener('resize', () => { if (window.innerWidth > 960) setMenu(false); });
   }
 
   // Only one FAQ item open at a time

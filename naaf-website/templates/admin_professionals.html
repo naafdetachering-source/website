@@ -42,7 +42,7 @@
                   <p class="form-note" style="margin:2px 0 0;">{{ p.aangemaakt_op }}</p>
                 </div>
               </div>
-              <div style="display:flex; gap:8px;">
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
                 {% if p.cv_bestandsnaam %}
                   <a href="{{ url_for('admin_download_professional_cv', professional_id=p.id) }}" target="_blank" rel="noopener" class="btn btn-outline" style="padding:8px 16px; font-size:0.85rem;">Bekijk cv</a>
                   <a href="{{ url_for('admin_download_professional_cv', professional_id=p.id, download=1) }}" class="btn btn-outline" style="padding:8px 16px; font-size:0.85rem;">Downloaden</a>

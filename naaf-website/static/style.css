@@ -963,3 +963,95 @@ a.job-row:hover{background:var(--paper);}
 @media (max-width: 780px){
   .profile-grid{grid-template-columns:1fr;}
 }
+
+/* ---------- MOBIEL / RESPONSIVE FIXES ---------- */
+/* Verticale padding los zetten, zodat .wrap z'n zijmarges op mobiel houdt */
+.hero{padding:0;}
+.hero-inner{padding-left:32px;padding-right:32px;}
+.trust-row{padding:34px 32px;}
+/* Grid-kolommen mogen krimpen (anders duwen date/file-inputs de pagina breder dan het scherm) */
+.dual-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+.dual-panel,.field,.form-row > *{min-width:0;}
+.field input:not([type="checkbox"]):not([type="radio"]),.field select,.field textarea{width:100%;max-width:100%;}
+.nav-mobile-extra{display:none;}
+
+@media (max-width: 960px){
+  .hero-inner{padding-left:24px;padding-right:24px;}
+  .trust-row{padding:28px 24px;row-gap:18px;}
+  .dual-grid{grid-template-columns:minmax(0,1fr);}
+  .nav{padding:14px 0;gap:12px;}
+  .menu-toggle{margin-right:-6px;}
+  .menu-toggle span{transition:transform 0.2s ease, opacity 0.2s ease;}
+  header.site.menu-open .menu-toggle span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+  header.site.menu-open .menu-toggle span:nth-child(2){opacity:0;}
+  header.site.menu-open .menu-toggle span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+  /* Uitklapmenu (inhoudsopgave) */
+  header.site.menu-open nav.links{
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:0;
+    position:absolute;
+    top:100%;
+    left:0;
+    right:0;
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+    box-shadow:0 12px 24px rgba(18,20,28,0.08);
+    padding:8px 24px 20px;
+    max-height:calc(100vh - 64px);
+    max-height:calc(100dvh - 64px);
+    overflow-y:auto;
+  }
+  header.site.menu-open nav.links > a{
+    display:block;
+    padding:14px 0;
+    font-size:1.05rem;
+    color:var(--ink);
+    border-bottom:1px solid var(--line);
+  }
+  .step{padding-right:16px;}
+  .final-cta-ctas{width:100%;}
+}
+
+@media (max-width: 960px){
+  .nav-cta{display:none;}
+  .brand{flex:none;}
+  header.site.menu-open .nav-mobile-extra{
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:12px;
+    padding-top:20px;
+  }
+  .nav-mobile-extra .btn{width:100%;}
+  nav.links .nav-mobile-extra .btn{color:#fff;}
+  .nav-mobile-extra .nav-mobile-sub{text-align:center;padding:6px 0;font-weight:500;}
+}
+
+@media (max-width: 560px){
+  .wrap,.hero-inner,.trust-row{padding-left:20px;padding-right:20px;}
+  .hero-inner{padding-top:48px;padding-bottom:56px;gap:36px;}
+  .hero-ctas > div{width:100%;}
+  .hero-ctas .btn{width:100%;}
+  .match-card{padding:22px 18px;}
+  .node{width:auto;flex:1;}
+  .node-row{align-items:flex-start;}
+  .section-head{margin-bottom:36px;}
+  .dual-panel{padding:48px 20px;}
+  .dual-panel h3{font-size:1.45rem;}
+  .expertise-item{padding:24px 20px;}
+  .final-cta-ctas .btn{width:100%;}
+  .footer-grid{gap:28px;padding-bottom:32px;}
+  .footer-bottom{flex-direction:column;gap:6px;}
+  /* 16px voorkomt dat iOS inzoomt als je een veld aantikt */
+  .field input,.field select,.field textarea,.tag-input-field,.filter-bar select{font-size:16px;}
+  .job-row{padding:22px 0;gap:14px;}
+  .job-row-main{min-width:0;flex-basis:100%;}
+  .job-row-meta{text-align:left;min-width:0;align-items:flex-start !important;}
+  .admin-subnav{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .admin-subnav a{white-space:nowrap;padding:12px 10px;}
+  .profile-card{padding:20px;}
+}
+.field .tag-input-box .tag-input-field{border:none;outline:none;padding:6px 4px;width:auto;flex:1;min-width:120px;background:transparent;}

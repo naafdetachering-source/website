@@ -67,7 +67,7 @@
               </div>
               <div class="job-row-meta" style="align-items:flex-end;">
                 <span>{{ opdracht['aantal_sollicitaties'] }} sollicitatie(s)</span>
-                <div style="display:flex; gap:10px; margin-top:10px;">
+                <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
                   <a href="{{ url_for('admin_sollicitaties', opdracht_id=opdracht['id']) }}" class="btn btn-outline" style="padding:8px 16px; font-size:0.85rem;">Bekijk sollicitaties</a>
                   <a href="{{ url_for('admin_opdracht_wijzigen', opdracht_id=opdracht['id']) }}" class="btn btn-outline" style="padding:8px 16px; font-size:0.85rem;">Wijzigen</a>
                   <a href="{{ url_for('opdracht_detail', opdracht_id=opdracht['id']) }}" class="btn btn-outline" style="padding:8px 16px; font-size:0.85rem;">Bekijk live</a>
