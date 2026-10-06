@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ 'Opdracht wijzigen' if modus == 'wijzigen' else 'Nieuwe opdracht' }} — Naaf beheer{% endblock %}
+{% block title %}{{ 'Opdracht wijzigen' if modus == 'wijzigen' else 'Nieuwe opdracht' }} | Naaf beheer{% endblock %}
 {% block content %}
 
   <section style="padding-top:24px; padding-bottom:96px;">
@@ -20,7 +20,7 @@
       {% if modus != 'wijzigen' %}
       <div class="ai-fill-box">
         <h3 style="font-size:1.05rem; margin-bottom:6px;">Automatisch invullen met AI</h3>
-        <p class="form-note" style="margin:0 0 14px;">Plak de vacaturetekst hieronder, of upload de pdf (bijv. van Flextender). De velden worden dan zo goed mogelijk voorgevuld — controleer alles, en vul zelf het tarief in.</p>
+        <p class="form-note" style="margin:0 0 14px;">Plak de vacaturetekst hieronder, of upload de pdf (bijv. van Flextender). De velden worden dan zo goed mogelijk voorgevuld. Controleer alles en vul zelf het tarief in.</p>
 
         <form class="intake-form" method="post" enctype="multipart/form-data" action="{{ url_for('admin_opdracht_ai_invullen') }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -109,7 +109,7 @@ Je hebt aantoonbare ervaring met ...">{{ voorinvulling.eisen|join('\n') if voori
         </div>
 
         <div class="field">
-          <label for="o-wensen">Wensen <span class="optional">(optioneel — laat leeg als er geen wensen zijn)</span></label>
+          <label for="o-wensen">Wensen <span class="optional">(optioneel, laat leeg als er geen wensen zijn)</span></label>
           <p class="form-note" style="margin:0 0 8px;">Eén wens per regel.</p>
           <textarea id="o-wensen" name="wensen" style="min-height:120px;">{{ voorinvulling.wensen|join('\n') if voorinvulling else '' }}</textarea>
         </div>

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Status van je sollicitatie — Naaf{% endblock %}
+{% block title %}Status van je sollicitatie | Naaf{% endblock %}
 {% block content %}
 
   <section style="padding-top:80px; padding-bottom:96px;">
@@ -18,11 +18,11 @@
 
         <p class="form-note" style="margin-top:20px;">
           {% if sollicitatie['status'] == 'in behandeling' %}
-            We bekijken je sollicitatie nog. Zodra daar verandering in komt, zie je dat hier terug — je hoeft niet zelf te informeren.
+            We bekijken je sollicitatie nog. Zodra daar verandering in komt, zie je dat hier terug. Je hoeft niet zelf te informeren.
           {% elif sollicitatie['status'] == 'gaat door' %}
-            Goed nieuws — je sollicitatie gaat door naar de volgende stap. We nemen persoonlijk contact met je op.
+            Goed nieuws: je sollicitatie gaat door naar de volgende stap. We nemen persoonlijk contact met je op.
           {% elif sollicitatie['status'] == 'afgewezen' %}
-            Deze keer is er helaas geen match. Bedankt voor je interesse — kijk gerust of er een andere opdracht bij je past.
+            Deze keer is er helaas geen match. Bedankt voor je interesse. Kijk gerust of er een andere opdracht bij je past.
           {% endif %}
         </p>
 

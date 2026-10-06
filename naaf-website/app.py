@@ -370,7 +370,7 @@ def send_email(subject: str, body: str, to_address: str, attachment_path: str | 
     mail_from = os.environ.get("MAIL_FROM", user)
 
     if not all([host, user, password, mail_from]):
-        app.logger.warning("SMTP is niet (volledig) geconfigureerd — e-mail niet verstuurd: %r", subject)
+        app.logger.warning("SMTP is niet (volledig) geconfigureerd, e-mail niet verstuurd: %r", subject)
         return False
 
     message = EmailMessage()
@@ -489,7 +489,7 @@ def extract_text_from_pdf(file_storage) -> str:
 
     if not tekst.strip():
         raise AIExtractError(
-            "Er kon geen tekst uit deze pdf gehaald worden — mogelijk is het een ingescande "
+            "Er kon geen tekst uit deze pdf gehaald worden. Mogelijk is het een ingescande "
             "afbeelding zonder doorzoekbare tekst. Plak de tekst dan handmatig in het tekstveld."
         )
     return tekst
@@ -537,6 +537,7 @@ precies met deze sleutels:
 Regels:
 - Geef ALLEEN het JSON-object terug, niets ervoor of erna.
 - Schrijf de omschrijving in eigen, natuurlijke bewoording — kopieer de brontekst niet woordelijk over.
+- Gebruik nergens gedachtestreepjes (— of –); gebruik gewone leestekens zoals punten, komma's of dubbele punten.
 - Als een veld niet met zekerheid uit de tekst valt af te leiden, geef dan een lege string "" (of [] voor eisen/wensen) — verzin niets.
 
 Brontekst:
@@ -659,7 +660,7 @@ def contact_bedrijf():
         "Heb je in de tussentijd een vraag? Antwoord gerust op deze e-mail.\n\n"
         "Met vriendelijke groet,\nTeam Naaf"
     )
-    send_email("We hebben je aanvraag ontvangen — Naaf", confirmation_body, email)
+    send_email("We hebben je aanvraag ontvangen | Naaf", confirmation_body, email)
 
     flash("Bedankt! We hebben je aanvraag ontvangen en nemen persoonlijk contact met je op.", "bedrijf-success")
     return redirect(url_for("index") + "#bedrijven")
@@ -786,7 +787,7 @@ def contact_professional():
         "bij je past.\n\n"
         "Met vriendelijke groet,\nTeam Naaf"
     )
-    send_email("We hebben je aanmelding ontvangen — Naaf", confirmation_body, email)
+    send_email("We hebben je aanmelding ontvangen | Naaf", confirmation_body, email)
 
     flash("Bedankt voor je aanmelding! We nemen persoonlijk contact met je op zodra er een passende opdracht is.", "professional-success")
     return redirect(url_for("index") + "#professionals")
@@ -951,7 +952,7 @@ def opdracht_solliciteren(opdracht_id):
     notify_lines.append("Het cv is als bijlage toegevoegd (of terug te vinden in het beheerpaneel).")
 
     send_email(
-        f"Nieuwe sollicitatie: {naam} — {opdracht['titel']}",
+        f"Nieuwe sollicitatie: {naam} | {opdracht['titel']}",
         "\n".join(notify_lines),
         CONTACT_EMAIL,
         attachment_path=opgeslagen_pad,
@@ -960,7 +961,7 @@ def opdracht_solliciteren(opdracht_id):
 
     volg_url = url_for("sollicitatie_status", token=volg_token, _external=True)
     send_email(
-        f"We hebben je sollicitatie ontvangen — {opdracht['titel']}",
+        f"We hebben je sollicitatie ontvangen: {opdracht['titel']}",
         (
             f"Hoi {naam},\n\n"
             f"Bedankt voor je sollicitatie op '{opdracht['titel']}'. We hebben je gegevens, "
@@ -1232,7 +1233,7 @@ def admin_opdracht_ai_invullen():
         return render_template("admin_opdracht_form.html", functies=FUNCTIES, voorinvulling=None, opdracht=None, modus="nieuw")
 
     flash(
-        "De velden zijn automatisch ingevuld op basis van de vacaturetekst — controleer alles, "
+        "De velden zijn automatisch ingevuld op basis van de vacaturetekst. Controleer alles "
         "en vul zelf nog het tarief in voordat je de opdracht plaatst.",
         "admin-success",
     )
